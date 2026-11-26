@@ -1,0 +1,34 @@
+quantization:
+  method: static_qdq
+  activation_type: QInt8
+  weight_type: QInt8
+  calibrate_method: MinMax
+  per_channel: true
+  calibration_split: train_and_val_only
+  calibration_num_images: 200
+  calibration_seed: 42
+
+fallback_ladder:
+  - stage: per_channel_static_qdq
+    per_channel: true
+    keep_head_fp32: false
+  - stage: selective_fp32_head
+    per_channel: true
+    keep_head_fp32: true
+    fp32_node_name_patterns:
+      - "head"
+      - "cls_preds"
+      - "reg_preds"
+      - "obj_preds"
+      - "box_predictor"
+      - "classification_head"
+      - "regression_head"
+  - stage: qat_timeboxed
+    max_gpu_hours: 3.0
+    max_epochs: 10
+    min_val_map_gain: 0.005
+
+tolerances:
+  max_val_map50_drop: 0.015
+  max_bbox_l1_px: 3.0
+  max_score_abs_diff: 0.08

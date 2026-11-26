@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edgevision-inspector"
+version = "0.1.0"
+description = "Industrial steel-surface defect detection system with reproducible evaluation, ONNX/INT8 optimization, and CPU-first FastAPI serving."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+dependencies = [
+    "numpy>=1.26.0,<3.0.0",
+    "pillow>=10.0.0",
+    "pyyaml>=6.0.1",
+    "torch>=2.2.0,<2.7.0",
+    "torchvision>=0.17.0,<0.22.0",
+    "onnx>=1.16.0,<1.18.0",
+    "onnxscript>=0.1.0",
+    "onnxruntime>=1.18.0,<1.21.0",
+    "pycocotools>=2.0.7",
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.30.0",
+    "python-multipart>=0.0.9",
+    "pydantic>=2.7.0",
+    "psutil>=5.9.8",
+    "matplotlib>=3.8.0",
+    "pandas>=2.2.0",
+    "scipy>=1.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "httpx>=0.27.0",
+    "ruff>=0.5.0",
+]
+
+[project.scripts]
+edgevision = "edgevision.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra -q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "B", "UP"]
+ignore = ["E501"]

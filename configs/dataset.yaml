@@ -1,0 +1,69 @@
+dataset_name: NEU-DET
+native_resolution: [200, 200]
+source_channels: 1
+annotation_format: voc_xml
+
+# Canonical 0-indexed class mapping for internal models and evaluation.
+# Torchvision detectors reserve class 0 for background and shift foreground IDs by +1 internally.
+classes:
+  - id: 0
+    name: crazing
+    display_name: Crazing
+    aliases: ["crazing", "Crazing"]
+  - id: 1
+    name: inclusion
+    display_name: Inclusion
+    aliases: ["inclusion", "Inclusion"]
+  - id: 2
+    name: patches
+    display_name: Patches
+    aliases: ["patches", "Patches"]
+  - id: 3
+    name: pitted_surface
+    display_name: Pitted surface
+    aliases: ["pitted_surface", "Pitted surface", "pitted surface", "pitted-surface"]
+  - id: 4
+    name: rolled_in_scale
+    display_name: Rolled-in scale
+    aliases: ["rolled-in_scale", "rolled_in_scale", "Rolled-in scale", "rolled-in scale", "rolled in scale"]
+  - id: 5
+    name: scratches
+    display_name: Scratches
+    aliases: ["scratches", "Scratches"]
+
+licence_gate:
+  source_url: ""
+  dataset_version: ""
+  access_date: ""
+  licence_status: pending_verification
+  redistribution_permitted: false
+  notes: "Verify exact source terms before redistributing images, annotations, or derived artifacts."
+
+split:
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  seed: 42
+  near_duplicate_phash_max_dist: 4
+  near_duplicate_cosine_min: 0.995
+  strict_leakage_check: true
+
+evaluation_views:
+  natural_hard_max_images: 50
+  corruption_seed: 42
+  corruptions:
+    - name: brightness_shift
+      delta: -35.0
+    - name: contrast_reduce
+      alpha: 0.65
+    - name: gaussian_blur
+      radius: 1.5
+    - name: gaussian_noise
+      sigma: 15.0
+    - name: rotation_small
+      angle_deg: 7.0
+
+paths:
+  raw_dir: data/raw/NEU-DET
+  manifests_dir: data/manifests
+  reports_dir: reports

@@ -1,0 +1,71 @@
+name: EdgeVision CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install --no-deps -e .
+
+      - name: Run Ruff lint checks
+        run: ruff check src tests
+
+      - name: Run unit and integration tests
+        run: pytest -v
+
+      - name: Verify validation-only regression check logic (synthetic baseline)
+        run: |
+          python - <<'PY'
+          from edgevision.evaluation.evaluate import (
+              check_validation_regression,
+              create_validation_baseline,
+              select_operating_points_from_validation,
+          )
+          from edgevision.evaluation.metrics import compute_coco_map
+          import tempfile
+          from pathlib import Path
+
+          classes = ["crazing", "inclusion", "patches", "pitted_surface", "rolled_in_scale", "scratches"]
+          gts = {
+              f"v{i}": [
+                  {"class_id": cid, "bbox_xyxy": [10.0 + cid * 20, 10.0, 28.0 + cid * 20, 35.0]}
+                  for cid in range(6)
+              ]
+              for i in range(6)
+          }
+          preds = {
+              k: [{"class_id": g["class_id"], "score": 0.9, "bbox_xyxy": g["bbox_xyxy"]} for g in v]
+              for k, v in gts.items()
+          }
+          op = select_operating_points_from_validation(preds, gts, classes)
+          with tempfile.TemporaryDirectory() as tmp:
+              mf = Path(tmp) / "val.jsonl"
+              mf.write_text("{}", encoding="utf-8")
+              baseline = create_validation_baseline(
+                  preds, gts, op, classes, mf, {"architecture": "ci_smoke"}, bootstrap_replicates=50
+              )
+          coco = compute_coco_map(preds, gts, num_classes=6)
+          res = check_validation_regression(
+              coco, op["recall_target_operating_point"]["validation_metrics"], baseline
+          )
+          assert res["passed"], f"Synthetic validation regression check failed: {res}"
+          print("Validation regression gate smoke check passed.")
+          PY

@@ -1,0 +1,47 @@
+model:
+  architecture: ssdlite320_mobilenet_v3_large
+  num_classes: 6
+  input_size: [320, 320]
+  resolution_group: matched_320
+  pretrained: true
+  trainable_backbone_layers: 6
+  provenance:
+    library: torchvision
+    weights_enum: SSDLite320_MobileNet_V3_Large_Weights.DEFAULT
+    licence: BSD-3-Clause
+    notes: "Native 320x320 anchor configuration preserved; no 224x224 anchor-generator surgery."
+
+training:
+  seed: 42
+  epochs: 40
+  batch_size: 16
+  num_workers: 2
+  optimizer: adamw
+  lr: 0.0005
+  weight_decay: 0.0001
+  scheduler: cosine
+  warmup_epochs: 3
+  early_stopping_patience: 10
+  grad_clip_norm: 10.0
+  amp: true
+  resume_from: null
+
+augmentation:
+  horizontal_flip_prob: 0.5
+  vertical_flip_prob: 0.2
+  max_rotation_deg: 5.0
+  rotation_prob: 0.3
+  brightness_delta: 0.15
+  contrast_range: [0.85, 1.15]
+  gaussian_noise_std: 5.0
+  gaussian_blur_prob: 0.15
+
+postprocessing:
+  score_threshold_pre_nms: 0.05
+  nms_iou_threshold: 0.45
+  max_detections: 100
+  class_aware_nms: true
+
+onnx:
+  opset_version: 17
+  batch_size: 1

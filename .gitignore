@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Raw datasets and local downloads
+data/raw/
+data/processed/
+data/cache/
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Checkpoints, large model binaries, and scratch outputs
+checkpoints/
+runs/
+outputs/
+artifacts/*.onnx
+artifacts/*.pth
+artifacts/*.pt
+!artifacts/.gitkeep
+
+# Secrets and credentials
+.env
+.env.*
+kaggle.json
+.kaggle/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
